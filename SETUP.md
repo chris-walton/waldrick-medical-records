@@ -15,6 +15,10 @@ This runbook takes you from a fresh clone to a deployed, Access-protected app.
   prompting. If you ever see an "ignored build scripts" notice, run `pnpm approve-builds`.)
 - A **Cloudflare account** (Free tier works for D1/R2 at small scale — confirm current limits)
   with **Zero Trust** enabled for Cloudflare Access.
+- The zone **`waldrickservices.com`** must be active in this same Cloudflare account (the app
+  is served at **`medical.waldrickservices.com`** via a Workers Custom Domain — see step 5).
+  There must be **no pre-existing CNAME** on `medical.waldrickservices.com`; Cloudflare creates
+  the DNS record and TLS certificate automatically on deploy.
 - Wrangler is installed as a dev dependency — run it with `pnpm exec wrangler …`.
 - Authenticate wrangler once: `pnpm exec wrangler login`.
 
@@ -58,20 +62,25 @@ lab result, visit, vitals).
 
 ## 5. First deploy
 
-Deploy once so the Worker and its URL exist (Access is attached to a URL in the next step):
+Deploy once so the Worker and its Custom Domain exist (Access is attached to the domain in the
+next step). Because `wrangler.jsonc` declares the `medical.waldrickservices.com` Custom Domain,
+this deploy also creates the DNS record and provisions the TLS certificate automatically:
 
 ```bash
 pnpm run deploy    # builds the Angular app, then `wrangler deploy`
 # (use `pnpm run deploy`, not `pnpm deploy` — the latter is a built-in pnpm command)
 ```
 
-Note the deployed URL, e.g. `https://waldrick-medical-records.<subdomain>.workers.dev`.
+The app will be reachable at **`https://medical.waldrickservices.com`** once the certificate
+finishes provisioning (usually a minute or two; it can take longer on first issuance). A
+`workers.dev` URL is also available unless you disable it.
 
 ## 6. Protect it with Cloudflare Access
 
 1. In the **Zero Trust dashboard** → **Access → Applications → Add an application →
    Self-hosted**.
-2. Set the application domain to the Worker URL from step 5.
+2. Set the application domain to **`medical.waldrickservices.com`** (the Custom Domain from
+   step 5).
 3. Add a **policy** allowing your household (e.g. an *Emails* rule listing each person's
    email, or an *Email domain* rule).
 4. After creating it, open the application's **settings** and copy the **Application Audience

@@ -47,7 +47,7 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>Member</th><th>What's due</th><th>Type</th><th>Due</th><th>Status</th><th></th></tr>
+              <tr><th>Member</th><th>What's due</th><th>Type</th><th class="col-date">Due</th><th>Status</th><th></th></tr>
             </thead>
             <tbody>
               @for (s of items(); track s.id) {
@@ -55,7 +55,7 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
                   <td>{{ s.family_member_name }}</td>
                   <td>{{ s.title }}</td>
                   <td>{{ s.record_type_label || '—' }}</td>
-                  <td>
+                  <td class="col-date">
                     {{ s.due_date ? (s.due_date | date: 'mediumDate') : '—' }}
                     @if (isOverdue(s)) { <span class="severity-urgent">(overdue)</span> }
                   </td>
@@ -100,6 +100,10 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
       .data-table td {
         padding: 8px 12px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      .data-table th.col-date,
+      .data-table td.col-date {
+        text-align: right;
       }
       .overdue-row {
         background: #fff4f3;

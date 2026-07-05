@@ -61,7 +61,7 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
         <div class="table-wrap">
           <table class="data-table">
             <thead>
-              <tr><th>File</th><th>Member</th><th>Size</th><th>Uploaded</th><th></th></tr>
+              <tr><th>File</th><th>Member</th><th>Size</th><th class="col-date">Uploaded</th><th></th></tr>
             </thead>
             <tbody>
               @for (d of filtered(); track d.id) {
@@ -73,7 +73,7 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
                   </td>
                   <td class="muted">{{ d.family_member_name || 'Unfiled' }}</td>
                   <td class="muted">{{ size(d.size_bytes) }}</td>
-                  <td class="muted">{{ d.uploaded_at | date: 'medium' }}</td>
+                  <td class="muted col-date">{{ d.uploaded_at | date: 'medium' }}</td>
                   <td class="row-actions">
                     <a mat-icon-button [href]="url(d.id)" target="_blank" rel="noopener" matTooltip="Open">
                       <mat-icon>download</mat-icon>
@@ -120,6 +120,10 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
       .data-table td {
         padding: 8px 12px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      .data-table th.col-date,
+      .data-table td.col-date {
+        text-align: right;
       }
       .doc-link {
         display: inline-flex;

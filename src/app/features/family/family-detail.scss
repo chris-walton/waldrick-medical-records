@@ -72,6 +72,11 @@
   vertical-align: middle;
 }
 
+.data-table th.col-date,
+.data-table td.col-date {
+  text-align: right;
+}
+
 .data-table tbody tr:hover {
   background: #f6f9fc;
 }

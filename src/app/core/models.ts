@@ -11,10 +11,14 @@ export interface FamilyMember {
   blood_type: string | null;
   relationship: string | null;
   notes: string | null;
+  color: string | null;
   photo_r2_key: string | null;
   created_at: string;
   updated_at: string;
 }
+
+/** How much of a record's event_date is known: full day, month+year, or year only. */
+export type DatePrecision = 'day' | 'month' | 'year';
 
 /** A field descriptor stored in RecordType.schema_json to drive dynamic form inputs. */
 export interface ExtraField {
@@ -39,6 +43,8 @@ export interface HealthRecord {
   record_type_id: string;
   title: string;
   event_date: string | null;
+  /** Granularity of event_date. Defaults to 'day' for full dates. */
+  date_precision: DatePrecision;
   provider: string | null;
   location: string | null;
   status: string | null;
