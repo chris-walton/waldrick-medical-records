@@ -1,15 +1,18 @@
 import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiService } from '../../core/api.service';
-import { FamilyMember } from '../../core/models';
+import { FamilyMember, RecordType } from '../../core/models';
 import { MemberDialog } from './member-dialog';
+import { BulkImmunizationDialog } from '../records/bulk-immunization-dialog';
 import { ConfirmDialog } from '../../shared/confirm-dialog';
 
 @Component({
@@ -29,9 +32,19 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
           <h1>Family</h1>
           <p class="page-subtitle">Everyone whose records you're tracking.</p>
         </div>
-        <button mat-flat-button color="primary" (click)="add()">
-          <mat-icon>person_add</mat-icon> Add member
-        </button>
+        <div class="header-actions">
+          <button
+            mat-stroked-button
+            color="primary"
+            [disabled]="members().length === 0"
+            (click)="logShots()"
+          >
+            <mat-icon>vaccines</mat-icon> Log shots
+          </button>
+          <button mat-flat-button color="primary" (click)="add()">
+            <mat-icon>person_add</mat-icon> Add member
+          </button>
+        </div>
       </div>
 
       @if (loading()) {
@@ -46,7 +59,9 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
           @for (m of members(); track m.id) {
             <mat-card class="member-card" (click)="open(m)">
               <mat-card-header>
-                <div mat-card-avatar class="avatar">{{ initial(m.name) }}</div>
+                <div mat-card-avatar class="avatar" [style.background]="m.color || '#00639b'">
+                  {{ initial(m.name) }}
+                </div>
                 <mat-card-title>{{ m.name }}</mat-card-title>
                 <mat-card-subtitle>{{ m.relationship || '—' }}</mat-card-subtitle>
                 <button
@@ -83,6 +98,10 @@ import { ConfirmDialog } from '../../shared/confirm-dialog';
   `,
   styles: [
     `
+      .header-actions {
+        display: flex;
+        gap: 8px;
+      }
       .member-card {
         cursor: pointer;
         transition: box-shadow 0.15s ease;
@@ -110,8 +129,10 @@ export class FamilyList {
   private api = inject(ApiService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private snackbar = inject(MatSnackBar);
 
   protected members = signal<FamilyMember[]>([]);
+  protected recordTypes = signal<RecordType[]>([]);
   protected loading = signal(true);
 
   constructor() {
@@ -120,9 +141,13 @@ export class FamilyList {
 
   private load(): void {
     this.loading.set(true);
-    this.api.listFamily().subscribe({
-      next: (m) => {
-        this.members.set(m);
+    forkJoin({
+      members: this.api.listFamily(),
+      types: this.api.listRecordTypes(),
+    }).subscribe({
+      next: (res) => {
+        this.members.set(res.members);
+        this.recordTypes.set(res.types);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -148,6 +173,25 @@ export class FamilyList {
       .open(MemberDialog, { data: {} })
       .afterClosed()
       .subscribe((res) => res && this.load());
+  }
+
+  protected logShots(): void {
+    this.dialog
+      .open(BulkImmunizationDialog, {
+        width: '520px',
+        data: { members: this.members(), recordTypes: this.recordTypes() },
+      })
+      .afterClosed()
+      .subscribe((records) => {
+        if (Array.isArray(records) && records.length) {
+          const n = records.length;
+          this.snackbar.open(
+            `Logged shot for ${n} family member${n > 1 ? 's' : ''}.`,
+            'Dismiss',
+            { duration: 4000 },
+          );
+        }
+      });
   }
 
   protected edit(m: FamilyMember): void {

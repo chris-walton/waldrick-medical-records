@@ -26,6 +26,25 @@ export interface MemberDialogData {
     <h2 mat-dialog-title>{{ editing ? 'Edit' : 'Add' }} family member</h2>
     <mat-dialog-content>
       <form class="dialog-form">
+        <div class="avatar-picker">
+          <div class="avatar-preview" [style.background]="model.color || defaultColor">
+            {{ initial }}
+          </div>
+          <div class="swatches">
+            @for (c of colors; track c) {
+              <button
+                type="button"
+                class="swatch"
+                [class.selected]="(model.color || defaultColor) === c"
+                [style.background]="c"
+                [attr.aria-label]="'Choose color ' + c"
+                [attr.aria-pressed]="(model.color || defaultColor) === c"
+                (click)="model.color = c"
+              ></button>
+            }
+          </div>
+        </div>
+
         <mat-form-field appearance="outline">
           <mat-label>Name</mat-label>
           <input matInput [(ngModel)]="model.name" name="name" required />
@@ -74,15 +93,74 @@ export interface MemberDialogData {
       </button>
     </mat-dialog-actions>
   `,
+  styles: [
+    `
+      .avatar-picker {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 4px;
+      }
+      .avatar-preview {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        font-weight: 500;
+        flex: 0 0 auto;
+      }
+      .swatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .swatch {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        transition: transform 0.1s ease, outline-color 0.1s ease;
+      }
+      .swatch:hover {
+        transform: scale(1.12);
+      }
+      .swatch.selected {
+        outline-color: #1a1a1a;
+      }
+    `,
+  ],
 })
 export class MemberDialog {
   private api = inject(ApiService);
   private ref = inject(MatDialogRef<MemberDialog>);
   private data = inject<MemberDialogData>(MAT_DIALOG_DATA);
 
-  protected readonly relationships = ['Self', 'Spouse', 'Child', 'Parent', 'Other'];
+  protected readonly relationships = ['Mother', 'Father', 'Child'];
   protected readonly editing = !!this.data.member;
   protected saving = signal(false);
+
+  /** Avatar swatch palette. First entry is the app-wide default. */
+  protected readonly colors = [
+    '#00639b',
+    '#146c2e',
+    '#8e24aa',
+    '#c62828',
+    '#00838f',
+    '#d81b60',
+    '#5e35b1',
+    '#ef6c00',
+    '#546e7a',
+    '#a15c00',
+  ];
+  protected readonly defaultColor = this.colors[0];
 
   protected model: Partial<FamilyMember> = {
     name: this.data.member?.name ?? '',
@@ -91,7 +169,13 @@ export class MemberDialog {
     sex: this.data.member?.sex ?? null,
     blood_type: this.data.member?.blood_type ?? null,
     notes: this.data.member?.notes ?? null,
+    color: this.data.member?.color ?? null,
   };
+
+  /** First letter of the current name, for the live avatar preview. */
+  protected get initial(): string {
+    return this.model.name?.trim().charAt(0).toUpperCase() || '?';
+  }
 
   protected save(): void {
     if (!this.model.name) return;

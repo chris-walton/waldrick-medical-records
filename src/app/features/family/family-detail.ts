@@ -12,7 +12,13 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiService } from '../../core/api.service';
-import { DocumentMeta, FamilyMember, HealthRecord, RecordType, ScheduleItem } from '../../core/models';
+import {
+  DocumentMeta,
+  FamilyMember,
+  HealthRecord,
+  RecordType,
+  ScheduleItem,
+} from '../../core/models';
 import { MemberDialog } from './member-dialog';
 import { RecordDialog } from '../records/record-dialog';
 import { ScheduleDialog } from '../schedule/schedule-dialog';
@@ -90,6 +96,35 @@ export class FamilyDetail {
     this.api.listDocuments({ familyMemberId: this.id() }).subscribe((d) => this.documents.set(d));
   }
 
+  private static readonly MONTHS = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  /**
+   * Format a record's event_date honouring its precision: "Jun 15, 2020" for a full
+   * day, "Jun 2020" when only the month is known, "2020" when only the year is.
+   * Parses the stored string directly to avoid the timezone drift DatePipe can add.
+   */
+  protected recordDate(r: HealthRecord): string {
+    if (!r.event_date) return '—';
+    const [y, m, d] = r.event_date.split('-').map(Number);
+    if (r.date_precision === 'year') return `${y}`;
+    const month = FamilyDetail.MONTHS[m - 1] ?? '';
+    if (r.date_precision === 'month') return `${month} ${y}`;
+    return `${month} ${d}, ${y}`;
+  }
+
   protected extras(record: HealthRecord): string {
     if (!record.data_json) return '';
     try {
@@ -141,9 +176,11 @@ export class FamilyDetail {
   }
 
   protected deleteRecord(r: HealthRecord): void {
-    this.confirm(`Delete "${r.title}"?`, 'This record will be permanently removed.').subscribe((ok) => {
-      if (ok) this.api.deleteRecord(r.id).subscribe(() => this.reloadRecords());
-    });
+    this.confirm(`Delete "${r.title}"?`, 'This record will be permanently removed.').subscribe(
+      (ok) => {
+        if (ok) this.api.deleteRecord(r.id).subscribe(() => this.reloadRecords());
+      },
+    );
   }
 
   // --- schedule ---
@@ -163,7 +200,11 @@ export class FamilyDetail {
   protected editSchedule(s: ScheduleItem): void {
     this.dialog
       .open(ScheduleDialog, {
-        data: { item: s, members: this.member() ? [this.member()!] : [], recordTypes: this.recordTypes() },
+        data: {
+          item: s,
+          members: this.member() ? [this.member()!] : [],
+          recordTypes: this.recordTypes(),
+        },
       })
       .afterClosed()
       .subscribe((res) => res && this.reloadSchedule());
@@ -185,7 +226,9 @@ export class FamilyDetail {
   }
 
   protected isOverdue(s: ScheduleItem): boolean {
-    return s.status === 'pending' && !!s.due_date && s.due_date < new Date().toISOString().slice(0, 10);
+    return (
+      s.status === 'pending' && !!s.due_date && s.due_date < new Date().toISOString().slice(0, 10)
+    );
   }
 
   // --- documents ---
@@ -200,11 +243,12 @@ export class FamilyDetail {
   }
 
   protected deleteDocument(d: DocumentMeta): void {
-    this.confirm(`Delete "${d.filename}"?`, 'This file will be permanently removed from storage.').subscribe(
-      (ok) => {
-        if (ok) this.api.deleteDocument(d.id).subscribe(() => this.reloadDocuments());
-      },
-    );
+    this.confirm(
+      `Delete "${d.filename}"?`,
+      'This file will be permanently removed from storage.',
+    ).subscribe((ok) => {
+      if (ok) this.api.deleteDocument(d.id).subscribe(() => this.reloadDocuments());
+    });
   }
 
   private confirm(title: string, message: string) {

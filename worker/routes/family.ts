@@ -9,6 +9,7 @@ const FIELDS = [
   'blood_type',
   'relationship',
   'notes',
+  'color',
   'photo_r2_key',
 ] as const;
 
@@ -31,8 +32,8 @@ app.post('/', async (c) => {
   const ts = nowIso();
   await c.env.DB.prepare(
     `INSERT INTO family_members
-       (id, name, date_of_birth, sex, blood_type, relationship, notes, photo_r2_key, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, name, date_of_birth, sex, blood_type, relationship, notes, color, photo_r2_key, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
     .bind(
       id,
@@ -42,6 +43,7 @@ app.post('/', async (c) => {
       data.blood_type ?? null,
       data.relationship ?? null,
       data.notes ?? null,
+      data.color ?? null,
       data.photo_r2_key ?? null,
       ts,
       ts,
