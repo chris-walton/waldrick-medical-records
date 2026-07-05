@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 8px;
+}
+
+.brand-icon {
+  margin: 0 4px 0 8px;
+}
+
+.brand {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-email {
+  margin-left: 6px;
+  font-weight: 400;
+}
+
+.menu-caption {
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  color: #5f6368;
+}
+
+.app-container {
+  height: calc(100vh - 64px);
+}
+
+.app-sidenav {
+  width: 240px;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.app-content {
+  background: #f6f7f9;
+}
+
+@media (max-width: 599px) {
+  .brand {
+    display: none;
+  }
+  .user-email {
+    display: none;
+  }
+}
