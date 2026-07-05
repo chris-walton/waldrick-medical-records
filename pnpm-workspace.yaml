@@ -1,0 +1,11 @@
+# pnpm settings (pnpm 10.16+/11 moved these out of package.json).
+# Approve native postinstall build scripts required by the toolchain so `pnpm install`
+# doesn't block them: esbuild = Angular build, workerd = wrangler dev, sharp = image
+# optimization, lmdb/msgpackr-extract = Angular CLI cache, @parcel/watcher = file watching.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  sharp: true
+  workerd: true

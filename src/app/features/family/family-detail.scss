@@ -1,0 +1,120 @@
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: #00639b;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.member-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-lg {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #00639b;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  flex: 0 0 auto;
+}
+
+.notes {
+  margin-top: 6px;
+  max-width: 640px;
+}
+
+.detail-tabs {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-top: 8px;
+}
+
+.tab-body {
+  padding: 16px;
+}
+
+.tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table th {
+  text-align: left;
+  font-weight: 500;
+  color: #5f6368;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+  background: #f6f9fc;
+}
+
+.overdue-row {
+  background: #fff4f3;
+}
+
+.type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.type-pill mat-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+.doc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #00639b;
+  text-decoration: none;
+}
+
+.doc-link mat-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+.status-pending {
+  color: #a15c00;
+  text-transform: capitalize;
+}
+.status-done {
+  color: #146c2e;
+  text-transform: capitalize;
+}
+.status-skipped {
+  color: #5f6368;
+  text-transform: capitalize;
+}

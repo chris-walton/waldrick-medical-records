@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "waldrick-medical-records",
+  "account_id": "ce9999d7d59fce98a0bc0e7911cb6e1f",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-07-05",
+
+  // Serve the built Angular SPA as static assets, and run the Worker only for /api/*.
+  // Deep links (e.g. /family/123) fall back to index.html via single-page-application handling.
+  "assets": {
+    "directory": "./dist/waldrick-medical-records/browser",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  // D1 database. Create with `wrangler d1 create waldrick-medical` and paste the id below.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "waldrick-medical",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // R2 bucket for uploaded documents (scans, PDFs, images).
+  // Create with `wrangler r2 bucket create waldrick-medical-docs`.
+  "r2_buckets": [
+    {
+      "binding": "DOCS",
+      "bucket_name": "waldrick-medical-docs"
+    }
+  ],
+
+  // Cloudflare Access identity settings. After you create the self-hosted Access
+  // application, set TEAM_DOMAIN to https://<your-team>.cloudflareaccess.com and
+  // POLICY_AUD to the application's AUD tag. See SETUP.md.
+  "vars": {
+    "TEAM_DOMAIN": "https://REPLACE_WITH_TEAM.cloudflareaccess.com",
+    "POLICY_AUD": "REPLACE_WITH_ACCESS_APP_AUD_TAG"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

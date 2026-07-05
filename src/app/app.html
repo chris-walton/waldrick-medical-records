@@ -1,0 +1,40 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <button mat-icon-button (click)="toggle()" aria-label="Toggle navigation">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-icon class="brand-icon">health_and_safety</mat-icon>
+  <span class="brand">Waldrick Medical Records</span>
+  <span class="spacer"></span>
+  @if (identity().email) {
+    <button mat-button [matMenuTriggerFor]="userMenu">
+      <mat-icon>account_circle</mat-icon>
+      <span class="user-email">{{ identity().email }}</span>
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <div class="menu-caption">Signed in via Cloudflare Access</div>
+    </mat-menu>
+  }
+</mat-toolbar>
+
+<mat-sidenav-container class="app-container">
+  <mat-sidenav [opened]="opened()" mode="side" class="app-sidenav">
+    <mat-nav-list>
+      @for (item of nav; track item.path) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          routerLinkActive
+          #rla="routerLinkActive"
+          [activated]="rla.isActive"
+        >
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="app-content">
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>
